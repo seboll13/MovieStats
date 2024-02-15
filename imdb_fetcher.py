@@ -24,7 +24,7 @@ class IMDbDataFetcher:
 
 
     @timer
-    def get_full_cast_and_crew(self, movie_id):
+    def get_full_cast_and_crew(self, movie_id: str) -> list[str]:
         """Get the full cast and crew of a movie or TV show by its IMDb ID.
 
         Parameters
@@ -36,8 +36,3 @@ class IMDbDataFetcher:
         The full cast and crew of the movie or TV show
         """
         return self.ia.full_cast_and_crew(movie_id).cast_name
-
-
-if __name__ == '__main__':
-    fetcher = IMDbDataFetcher()
-    print(fetcher.get_full_cast_and_crew('tt1022603'))

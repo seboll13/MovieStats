@@ -1,3 +1,9 @@
+"""The main file to run the program.
+
+This file is used to run the program and display the results of the RatingsAnalyser object.
+"""
+
+
 from ratings_analyser import RatingsAnalyser
 from db_functions import create_local_database, populate_database
 
@@ -13,7 +19,7 @@ def on_start():
     populate_database()
 
 
-def format_output(data):
+def format_output(data: list) -> str:
     """Formats the output of the RatingsAnalyser object.
 
     Parameters
@@ -31,6 +37,7 @@ if __name__ == '__main__':
     #on_start()
 
     analyser = RatingsAnalyser('imdb_ratings.db')
+    
     print('###### Total movie watching time ######')
     print(f'{analyser.get_total_movie_watching_time(days=True)} days\n')
     print('###### Top 10 movies/shows ######')

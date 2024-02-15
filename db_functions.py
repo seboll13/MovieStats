@@ -8,7 +8,7 @@ DB_NAME = 'imdb_ratings.db'
 RATINGS_FILE = 'imdb_ratings.csv'
 
 
-def create_ratings_table(cursor: connect):
+def create_ratings_table(cursor: connect) -> None:
     """Create a table to store IMDb ratings.
     """
     cursor.execute(
@@ -32,7 +32,7 @@ def create_ratings_table(cursor: connect):
     )
 
 
-def create_actors_table(cursor: connect):
+def create_actors_table(cursor: connect) -> None:
     """Create a table to store actors.
     """
     cursor.execute(
@@ -43,7 +43,7 @@ def create_actors_table(cursor: connect):
     )
 
 
-def create_movie_actors_table(cursor: connect):
+def create_movie_actors_table(cursor: connect) -> None:
     """Create a table to store the relationships between movies and actors.
     """
     cursor.execute(
@@ -57,7 +57,7 @@ def create_movie_actors_table(cursor: connect):
     )
 
 
-def create_local_database(db_name: str = DB_NAME):
+def create_local_database(db_name: str = DB_NAME) -> None:
     """Create a local sqlite database to store IMDb ratings.
     """
     if not path.exists(db_name):
@@ -75,7 +75,7 @@ def create_local_database(db_name: str = DB_NAME):
         print('Database already exists')
 
 
-def populate_database(csv_ratings: str = RATINGS_FILE):
+def populate_database(csv_ratings: str = RATINGS_FILE) -> None:
     """Populate the local sqlite database with IMDb ratings.
         This function will search for ratings that are not already in the database and add them.
     """

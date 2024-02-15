@@ -1,4 +1,5 @@
-"""This module provides functions to analyze IMDb ratings data."""
+"""This module provides functions to analyze IMDb ratings data.
+"""
 
 from sqlite3 import connect
 
@@ -10,7 +11,7 @@ class RatingsAnalyser:
     """A class to analyse IMDb ratings data.
     """
 
-    def __init__(self, db_name):
+    def __init__(self, db_name: str = 'imdb_ratings.db'):
         self.conn = connect(db_name)
         self.cursor = self.conn.cursor()
 
@@ -19,7 +20,7 @@ class RatingsAnalyser:
         self.conn.close()
 
 
-    def get_top_ratings(self, top_n=10):
+    def get_top_ratings(self, top_n: int=10) -> list:
         """Gets the top_n personally highest-rated movies
         
         Parameters
@@ -37,7 +38,7 @@ class RatingsAnalyser:
         ).fetchall()
 
 
-    def get_movies_per_rating(self):
+    def get_movies_per_rating(self) -> list:
         """Gets the list of movies and/or TV shows for each rating.
         
         Returns
@@ -50,7 +51,7 @@ class RatingsAnalyser:
         ).fetchall()
 
 
-    def get_total_movie_watching_time(self, days=False):
+    def get_total_movie_watching_time(self, days: bool=False) -> float:
         """Get the total watching time in hours/days. Filter is done on movies only.
         
         Parameters
@@ -70,7 +71,7 @@ class RatingsAnalyser:
         return total_time / 60
 
 
-    def get_rating_differences(self):
+    def get_rating_differences(self) -> list:
         """Calculates the differences between personal ratings and IMDb ratings.
         
         Returns
@@ -148,7 +149,7 @@ class RatingsAnalyser:
     #     ).fetchall()
 
 
-    def get_mean_rating_for_highest_actors(self, top_n=10):
+    def get_mean_rating_for_highest_actors(self, top_n :int=10) -> list:
         """Gets the mean personal rating for the top_n highest-rated actors
         
         Parameters
@@ -169,7 +170,7 @@ class RatingsAnalyser:
         ).fetchall()
 
 
-    def get_stats_for_most_frequent_actors(self, top_n=10):
+    def get_stats_for_most_frequent_actors(self, top_n :int=10) -> list:
         """Gets the mean personal rating and count for the top_n actors with the most rated movies
         
         Parameters
@@ -191,7 +192,7 @@ class RatingsAnalyser:
         ).fetchall()
 
 
-    def get_movie_list_for(self, actor_name):
+    def get_movie_list_for(self, actor_name: str) -> list:
         """Gets the list of movies and/or TV shows for a given actor.
         
         Parameters
