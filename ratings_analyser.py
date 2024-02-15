@@ -11,7 +11,7 @@ class RatingsAnalyser:
     """A class to analyse IMDb ratings data.
     """
 
-    def __init__(self, db_name: str = 'imdb_ratings.db'):
+    def __init__(self, db_name: str = 'data/imdb_ratings.db'):
         self.conn = connect(db_name)
         self.cursor = self.conn.cursor()
 
@@ -83,36 +83,26 @@ class RatingsAnalyser:
         ).fetchall()
 
 
-    # def get_favourite_genres(self, top_n=10, min_count=5):
-    #     """Get the mean rating and the movie count for each genre.
+    def get_stats_for_favourite_genres(self, top_n: int=10):
+        """Gets the mean personal rating and count for the top_n genres with the most rated movies
         
-    #     Parameters
-    #     ----------
-    #     top_n: the number of top-rated genres to return
-    #     min_count: the minimum number of movies for a genre to be considered
-    #         This helps reduce the influence of genres with very few movies
-        
-    #     Returns
-    #     ----------
-    #     The mean rating and the movie count for each genre
-    #     """
-    #     self.data[GENRES_COL] = self.data[GENRES_COL].str.split(',')
-    #     ratings_expanded = self.data.explode(GENRES_COL)
-    #     ratings_expanded[GENRES_COL] = ratings_expanded[GENRES_COL].str.strip() # remove whitespaces
+        Parameters
+        ----------
+        top_n: the number of entries to return
 
-    #     genre_stats = ratings_expanded.groupby(GENRES_COL).agg({
-    #         RATING_COL: ['mean', 'count']
-    #     }).reset_index()
-
-    #     # Filter out genres with few movies
-    #     genre_stats = genre_stats[genre_stats[TITLE_COL] >= min_count]
-
-    #     top_genres = genre_stats.sort_values(by=RATING_COL, ascending=False).head(top_n)
-    #     top_genres = top_genres.rename(columns = {
-    #         RATING_COL: 'Average Rating',
-    #         TITLE_COL: 'Movie Count'
-    #     })
-    #     return top_genres
+        Returns
+        ----------
+        The mean rating and movie count for each genre
+        """
+        if top_n < 1:
+            raise ValueError(POSITIVE_INT_ERR_MESSAGE)
+        return self.cursor.execute(
+            f'''SELECT genres.name, COUNT(ratings.id), AVG(ratings.your_rating)
+            FROM imdb_ratings AS ratings
+            JOIN movie_genres ON ratings.id = movie_genres.movie_id
+            JOIN genres ON movie_genres.genre_id = genres.genre_id
+            GROUP BY genres.name ORDER BY COUNT(ratings.id) DESC LIMIT {top_n}'''
+        ).fetchall()
 
 
     # def get_mean_rating_for_highest_directors(self, top_n=10):

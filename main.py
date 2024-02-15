@@ -34,19 +34,19 @@ def format_output(data: list) -> str:
 
 
 if __name__ == '__main__':
-    #on_start()
+    on_start()
 
     analyser = RatingsAnalyser('imdb_ratings.db')
     
-    print('###### Total movie watching time ######')
-    print(f'{analyser.get_total_movie_watching_time(days=True)} days\n')
-    print('###### Top 10 movies/shows ######')
-    print(format_output(analyser.get_top_ratings()))
-    print()
-    print('###### Favourite actors ######')
-    print(format_output(analyser.get_stats_for_most_frequent_actors()))
-    print()
-    print('###### Rated Movies with Scarlett Johansson ######')
-    print(format_output(analyser.get_movie_list_for('Scarlett Johansson')))
+    # print('###### Total movie watching time ######')
+    # print(f'{analyser.get_total_movie_watching_time(days=True)} days\n')
+    # print('###### Top 10 movies/shows ######')
+    # print(format_output(analyser.get_top_ratings()))
+    # print()
+    # print('###### Favourite actors ######')
+    # print(format_output(analyser.get_stats_for_most_frequent_actors()))
+    # print()
+    # print('###### Rated Movies with Scarlett Johansson ######')
+    # print(format_output(analyser.get_movie_list_for('Scarlett Johansson')))
 
     del analyser
