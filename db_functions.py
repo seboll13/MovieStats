@@ -1,6 +1,9 @@
-import pandas as pd
-from os import path
+"""This module contains functions to create and populate a local sqlite database with IMDb ratings.
+"""
+
 from sqlite3 import connect
+from os import path
+import pandas as pd
 from imdb_fetcher import IMDbDataFetcher
 
 

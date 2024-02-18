@@ -1,66 +1,74 @@
+"""Utility functions for plotting data from the IMDb dataset.
+"""
+
+
+from statistics import fmean
 import numpy as np
 import matplotlib.pyplot as plt
-from constants import RATING_COL, IMDB_RATING_COL, GENRES_COL
 
 
-def draw_genre_histogram(top_genres, rating_col_name='Average Rating'):
-    """Draw a horizontal bar plot of favourite genres with their associated title count.
-    
+def plot_favourite_genre_ratings_histogram(top_genres: list) -> None:
+    """Draw a bar plot of favourite genres with their associated title count and average rating."""
+    plt.figure(figsize=(12, 8))
+    genres, counts, ratings = zip(*top_genres)
+    indices = range(len(genres))
+
+    plt.barh(indices, counts, color='skyblue', alpha=0.7, label='Movie Count')
+
+    # Add average ratings as text next to the bars
+    for i, (count, rating) in enumerate(zip(counts, ratings)):
+        plt.text(count, i, f' {rating:.2f}', va='center', ha='left', color='black')
+
+    plt.yticks(indices, genres)
+    plt.xlabel('Movie Count')
+    plt.title('Top-Rated Genres with Average Ratings')
+
+    plt.show()
+
+
+def plot_rating_difference_scatter(ratings: list) -> None:
+    """Draw scatter plot of IMDb ratings vs. personal ratings
+
     Parameters
     ----------
-    top_genres: the DataFrame containing the top-rated genres
+    ratings: list of 3-tuples containing movie, IMDb rating and the personal rating
     """
-    plt.figure(figsize=(10, 8))
-    plt.barh(top_genres[GENRES_COL], top_genres[rating_col_name], color='skyblue')
-    plt.xlabel(rating_col_name)
-    plt.title('Top-Rated Genres')
+    imdb_ratings = np.array([movie[1] for movie in ratings])
+    personal_ratings = np.array([movie[2] for movie in ratings])
+    slope, intercept = np.polyfit(imdb_ratings, personal_ratings, 1)
 
-    for index,value in enumerate(top_genres[rating_col_name]):
-        plt.text(value, index, str(top_genres['Movie Count'].iloc[index]))
-
-    plt.gca().invert_yaxis()
-    plt.show()
-
-
-def draw_scatter_plot(ratings):
-    """Draw scatter plot of IMDb ratings vs. personal ratings
-    """
-    plt.scatter(ratings[IMDB_RATING_COL], ratings[RATING_COL])
-    plt.xlabel(IMDB_RATING_COL)
-    plt.ylabel(RATING_COL)
-    plt.title('My Ratings vs. IMDb Ratings')
-    plt.show()
-
-
-def draw_scatter_plot_with_regression(ratings):
-    """Draw scatter plot of IMDb ratings vs. personal ratings with regression line
-    """
-    x = ratings[IMDB_RATING_COL]
-    y = ratings[RATING_COL]
-    m, b = np.polyfit(x, y, 1)  # m = slope, b = intercept
+    reg_line = slope * imdb_ratings + intercept
 
     # Add regression line to scatter plot
-    plt.scatter(x, y)
-    plt.plot(x, m*x + b, color='red')  # regression line
-    plt.xlabel(IMDB_RATING_COL)
-    plt.ylabel(RATING_COL)
-    plt.title('My Ratings vs. IMDb Ratings with Regression Line')
+    plt.scatter(imdb_ratings, personal_ratings)
+    plt.plot(imdb_ratings, reg_line, color='red')  # regression line
+    plt.xlabel('IMDb Rating')
+    plt.ylabel('Personal Rating')
+    plt.title('IMDb vs Personal Rating Differences incl. Regression Line')
+
     plt.show()
 
 
-def plot_rating_differences(ratings):
+def plot_rating_difference_distribution(rating_differences: list) -> None:
     """Plot the distribution of rating differences.
+
+    Parameters
+    ----------
+    rating_differences: list of 2-tuples with movie and the rating difference
     """
+    rating_differences = [diff for _,diff in rating_differences]
     plt.figure(figsize=(10, 6))
-    plt.hist(ratings['Rating Difference'], bins=30, color='skyblue', edgecolor='black')
+    plt.hist(rating_differences, bins=30, color='skyblue', edgecolor='black')
     plt.title('Distribution of Rating Differences (Your Rating - IMDb Rating)')
     plt.xlabel('Rating Difference')
     plt.ylabel('Frequency')
-    plt.axvline(ratings['Rating Difference'].mean(), color='red', linestyle='dashed', linewidth=1)
+
+    rmean = fmean(rating_differences)
+    plt.axvline(rmean, color='red', linestyle='dashed', linewidth=1)
     plt.text(
-        ratings['Rating Difference'].mean(),
+        rmean,
         plt.ylim()[1]*0.9,
-        f'Mean: {ratings["Rating Difference"].mean():.2f}',
+        f'Mean: {rmean:.2f}',
         color = 'red'
     )
     plt.grid(True)

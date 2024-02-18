@@ -3,7 +3,6 @@
 This file is used to run the program and display the results of the RatingsAnalyser object.
 """
 
-
 from ratings_analyser import RatingsAnalyser
 from db_functions import create_local_database, populate_database
 
@@ -37,16 +36,34 @@ if __name__ == '__main__':
     on_start()
 
     analyser = RatingsAnalyser('imdb_ratings.db')
-    
+
+    # Uncomment the following for text output
+    # print('###### Total movie count ######')
+    # print(f'{len(analyser)} movies\n')
+
     # print('###### Total movie watching time ######')
     # print(f'{analyser.get_total_movie_watching_time(days=True)} days\n')
+
     # print('###### Top 10 movies/shows ######')
     # print(format_output(analyser.get_top_ratings()))
     # print()
+
     # print('###### Favourite actors ######')
     # print(format_output(analyser.get_stats_for_most_frequent_actors()))
     # print()
+
     # print('###### Rated Movies with Scarlett Johansson ######')
     # print(format_output(analyser.get_movie_list_for('Scarlett Johansson')))
+
+
+    # Uncomment the following for plots
+    # top_genres = analyser.get_stats_for_favourite_genres()
+    # plot_favourite_genre_ratings_histogram(top_genres)
+
+    # ratings = analyser.get_ratings()
+    # plot_rating_difference_scatter(ratings)
+
+    # rating_differences = analyser.get_rating_differences()
+    # plot_rating_difference_distribution(rating_differences)
 
     del analyser
