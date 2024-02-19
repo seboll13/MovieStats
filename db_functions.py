@@ -220,3 +220,17 @@ def populate_database(csv_ratings: str = RATINGS_FILE) -> None:
     else:
         print('No new entries found')
     conn.close()
+
+
+def select(params: list[str], table: str='imdb_ratings') -> str:
+    """Creates a basic SQL query structure
+
+    Parameters
+    ----------
+    params: the parameters to include in the query
+
+    Returns
+    ----------
+    The formatted and ready to use SQL query
+    """
+    return f'''SELECT {', '.join(p for p in params)} FROM {table}'''

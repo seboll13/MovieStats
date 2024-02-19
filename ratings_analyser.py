@@ -38,7 +38,8 @@ class RatingsAnalyser:
         if top_n < 1:
             raise ValueError(POSITIVE_INT_ERR_MESSAGE)
         return self.cursor.execute(
-            f'''SELECT title, your_rating FROM imdb_ratings ORDER BY your_rating DESC LIMIT {top_n}'''
+            f'''SELECT title, your_rating FROM imdb_ratings 
+            ORDER BY your_rating DESC LIMIT {top_n}'''
         ).fetchall()
 
 
@@ -50,7 +51,7 @@ class RatingsAnalyser:
         The list of movies and/or TV shows
         """
         return self.cursor.execute(
-            '''SELECT your_rating, title FROM imdb_ratings
+            '''SELECT title, your_rating FROM imdb_ratings 
             GROUP BY your_rating ORDER BY your_rating DESC'''
         ).fetchall()
 
@@ -67,7 +68,8 @@ class RatingsAnalyser:
         The total watching time in hours/days
         """
         movies = self.cursor.execute(
-            '''SELECT runtime_mins FROM imdb_ratings WHERE title_type = 'movie' '''
+            '''SELECT runtime_mins FROM imdb_ratings 
+            WHERE title_type = 'movie' '''
         ).fetchall()
         total_time = sum(movie[0] for movie in movies)
         if days:
@@ -99,25 +101,38 @@ class RatingsAnalyser:
         ).fetchall()
 
 
-    def get_stats_for_favourite_genres(self, top_n: int=10):
-        """Gets the mean personal rating and count for the top_n genres with the most rated movies
+    def get_average_rating_by_genre(self) -> list:
+        """Gets the average rating for each genre
         
+        Returns
+        ----------
+        The average rating for each genre
+        """
+        return self.cursor.execute(
+            '''SELECT TRIM(genres.name), AVG(ratings.your_rating) FROM imdb_ratings AS ratings
+            JOIN movie_genres ON ratings.id = movie_genres.movie_id
+            JOIN genres ON movie_genres.genre_id = genres.genre_id
+            GROUP BY TRIM(genres.name) ORDER BY AVG(ratings.your_rating) DESC'''
+        ).fetchall()
+
+
+    def get_title_genre_ratings(self, is_movie: bool=True) -> list:
+        """Gets the mean personal rating and list of corresponding genres for each movie or TV show
+
         Parameters
         ----------
-        top_n: the number of entries to return
+        is_movie: if True, return only movies. Otherwise, return only TV shows or mini-series
 
         Returns
         ----------
-        The mean rating and movie count for each genre
+        A list of tuples containing the mean rating and list of genres for each title
         """
-        if top_n < 1:
-            raise ValueError(POSITIVE_INT_ERR_MESSAGE)
+        type_filter = "title_type='movie'" if is_movie else "(title_type='tvSeries' OR title_type='tvMiniSeries')"
         return self.cursor.execute(
-            f'''SELECT TRIM(genres.name), COUNT(ratings.id), AVG(ratings.your_rating)
-            FROM imdb_ratings AS ratings
+            f'''SELECT title, your_rating, GROUP_CONCAT(genres.name) FROM imdb_ratings AS ratings
             JOIN movie_genres ON ratings.id = movie_genres.movie_id
             JOIN genres ON movie_genres.genre_id = genres.genre_id
-            GROUP BY TRIM(genres.name) ORDER BY COUNT(ratings.id) DESC LIMIT {top_n}'''
+            WHERE {type_filter} GROUP BY title ORDER BY title'''
         ).fetchall()
 
 

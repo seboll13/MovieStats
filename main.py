@@ -38,22 +38,14 @@ if __name__ == '__main__':
     analyser = RatingsAnalyser('imdb_ratings.db')
 
     # Uncomment the following for text output
-    # print('###### Total movie count ######')
-    # print(f'{len(analyser)} movies\n')
-
     # print('###### Total movie watching time ######')
     # print(f'{analyser.get_total_movie_watching_time(days=True)} days\n')
 
-    # print('###### Top 10 movies/shows ######')
-    # print(format_output(analyser.get_top_ratings()))
-    # print()
-
-    # print('###### Favourite actors ######')
-    # print(format_output(analyser.get_stats_for_most_frequent_actors()))
-    # print()
-
     # print('###### Rated Movies with Scarlett Johansson ######')
     # print(format_output(analyser.get_movie_list_for('Scarlett Johansson')))
+
+    print('###### Genre Statistics ######')
+    print(format_output(analyser.get_title_genre_ratings(is_movie=False)))
 
 
     # Uncomment the following for plots
