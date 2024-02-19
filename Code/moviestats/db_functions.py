@@ -1,14 +1,15 @@
 """This module contains functions to create and populate a local sqlite database with IMDb ratings.
 """
 
+from pathlib import Path
 from sqlite3 import connect
 from os import path
 import pandas as pd
-from imdb_fetcher import IMDbDataFetcher
+from moviestats.imdb_fetcher import IMDbDataFetcher
 
 
 DB_NAME = 'imdb_ratings.db'
-RATINGS_FILE = 'data/imdb_ratings.csv'
+RATINGS_FILE = Path(__file__).parent.resolve() / '../data/imdb_ratings.csv'
 
 
 def create_ratings_table(cursor: connect) -> None:

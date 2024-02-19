@@ -3,8 +3,8 @@
 
 
 from collections import defaultdict
-from helpers import compute_weighted_rating
-from ratings_analyser import RatingsAnalyser
+from moviestats.helpers import compute_weighted_rating
+from moviestats.ratings_analyser import RatingsAnalyser
 
 
 def get_movie_genre_combination_ratings(analyser: RatingsAnalyser) -> list:

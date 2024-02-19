@@ -1,4 +1,25 @@
+"""This module contains helper functions for the RatingsAnalyser class.
+"""
+
+
+from functools import wraps
+from time import perf_counter
+
+
 MAX_GENRE_COMBINATIONS = 4
+
+
+def timer(func) -> callable:
+    """Prints the runtime of the decorated function.
+    """
+    @wraps(func)
+    def wrapper(*args, **kwargs) -> callable:
+        start = perf_counter()
+        res = func(*args, **kwargs)
+        end = perf_counter()
+        print(f'Elapsed time of {func.__name__!r}: {(end - start):.3f} [s]')
+        return res
+    return wrapper
 
 
 def format_basic_output(data: list) -> str:

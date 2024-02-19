@@ -3,11 +3,11 @@
 This file is used to run the program and display the results of the RatingsAnalyser object.
 """
 
-from ratings_analyser import RatingsAnalyser
-from helpers import format_genre_combinations_output
-from plotting_utils import plot_movie_genre_combinations
-from recommendations import get_movie_genre_combination_ratings
-from db_functions import create_local_database, populate_database
+from moviestats.ratings_analyser import RatingsAnalyser
+from moviestats.helpers import format_genre_combinations_output
+from moviestats.plotting_utils import plot_movie_genre_combinations
+from moviestats.recommendations import get_movie_genre_combination_ratings
+from moviestats.db_functions import create_local_database, populate_database
 
 
 def on_start():
@@ -22,7 +22,7 @@ def on_start():
 
 
 if __name__ == '__main__':
-    #on_start()
+    on_start()
     analyser = RatingsAnalyser('imdb_ratings.db')
 
     movie_genre_combinations = get_movie_genre_combination_ratings(analyser)
