@@ -142,7 +142,7 @@ def add_genres_to_database(
     cursor: The SQL cursor to use
     movie_id: The id of the movie to link the genres to
     """
-    genres = row['Genres'].split(',')
+    genres = row['Genres'].strip().split(',') # strip() fixes whitespace issue
     for genre in genres:
         cursor.execute(
             '''INSERT OR IGNORE INTO genres (name) VALUES (?)''', (genre,)

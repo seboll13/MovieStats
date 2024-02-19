@@ -101,6 +101,18 @@ class RatingsAnalyser:
         ).fetchall()
 
 
+    def get_mean_rating(self) -> float:
+        """Computes the mean rating across the entire dataset.
+        
+        Returns
+        ----------
+        The mean rating
+        """
+        return self.cursor.execute(
+            '''SELECT AVG(your_rating) FROM imdb_ratings'''
+        ).fetchone()[0]
+
+
     def get_average_rating_by_genre(self) -> list:
         """Gets the average rating for each genre
         
@@ -121,15 +133,15 @@ class RatingsAnalyser:
 
         Parameters
         ----------
-        is_movie: if True, return only movies. Otherwise, return only TV shows or mini-series
+        is_movie: if True, filter only movies. Otherwise, filter only TV shows or mini-series
 
         Returns
         ----------
-        A list of tuples containing the mean rating and list of genres for each title
+        A list of tuples containing the movie, its associated genres and the personal rating
         """
         type_filter = "title_type='movie'" if is_movie else "(title_type='tvSeries' OR title_type='tvMiniSeries')"
         return self.cursor.execute(
-            f'''SELECT title, your_rating, GROUP_CONCAT(genres.name) FROM imdb_ratings AS ratings
+            f'''SELECT title, GROUP_CONCAT(genres.name), your_rating FROM imdb_ratings AS ratings
             JOIN movie_genres ON ratings.id = movie_genres.movie_id
             JOIN genres ON movie_genres.genre_id = genres.genre_id
             WHERE {type_filter} GROUP BY title ORDER BY title'''

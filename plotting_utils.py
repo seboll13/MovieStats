@@ -8,7 +8,12 @@ import matplotlib.pyplot as plt
 
 
 def plot_favourite_genre_ratings_histogram(top_genres: list) -> None:
-    """Draw a bar plot of favourite genres with their associated title count and average rating."""
+    """Draw a bar plot of favourite genres with their associated title count and average rating.
+    
+    Parameters
+    ----------
+    top_genres: list of 3-tuples containing genre, title count and average rating
+    """
     plt.figure(figsize=(12, 8))
     genres, counts, ratings = zip(*top_genres)
     indices = range(len(genres))
@@ -22,6 +27,26 @@ def plot_favourite_genre_ratings_histogram(top_genres: list) -> None:
     plt.yticks(indices, genres)
     plt.xlabel('Movie Count')
     plt.title('Top-Rated Genres with Average Ratings')
+
+    plt.show()
+
+
+def plot_movie_genre_combinations(genre_combinations_avg_ratings: list) -> None:
+    """Draw a bar plot of movie genre combinations with their associated weighted average value.
+    
+    Parameters
+    ----------
+    genre_combinations_avg_ratings: list of 2-tuples containing genre combination and weighted average rating
+    """
+    plt.figure(figsize=(12, 8))
+    combinations, weighted_average = zip(*genre_combinations_avg_ratings)
+    indices = range(len(combinations))
+
+    plt.barh(indices, weighted_average, color='skyblue', alpha=0.7, label='Weighted Average')
+
+    plt.yticks(indices, (', '.join(comb) for comb in combinations))
+    plt.xlabel('Weighted Average Value')
+    plt.title('Top-Rated Movie Genre Combinations')
 
     plt.show()
 

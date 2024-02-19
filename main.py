@@ -4,6 +4,9 @@ This file is used to run the program and display the results of the RatingsAnaly
 """
 
 from ratings_analyser import RatingsAnalyser
+from helpers import format_genre_combinations_output
+from plotting_utils import plot_movie_genre_combinations
+from recommendations import get_movie_genre_combination_ratings
 from db_functions import create_local_database, populate_database
 
 
@@ -18,44 +21,14 @@ def on_start():
     populate_database()
 
 
-def format_output(data: list) -> str:
-    """Formats the output of the RatingsAnalyser object.
-
-    Parameters
-    ----------
-    data: The data to format
-
-    Returns
-    ----------
-    The formatted data
-    """
-    return '\n'.join([f'{idx+1}: {movie_tuple}' for idx,movie_tuple in enumerate(data)])
-
-
 if __name__ == '__main__':
-    on_start()
-
+    #on_start()
     analyser = RatingsAnalyser('imdb_ratings.db')
 
-    # Uncomment the following for text output
-    # print('###### Total movie watching time ######')
-    # print(f'{analyser.get_total_movie_watching_time(days=True)} days\n')
+    movie_genre_combinations = get_movie_genre_combination_ratings(analyser)
+    movie_3genre_combinations = [comb for comb in movie_genre_combinations if len(comb[0]) == 3]
 
-    # print('###### Rated Movies with Scarlett Johansson ######')
-    # print(format_output(analyser.get_movie_list_for('Scarlett Johansson')))
-
-    print('###### Genre Statistics ######')
-    print(format_output(analyser.get_title_genre_ratings(is_movie=False)))
-
-
-    # Uncomment the following for plots
-    # top_genres = analyser.get_stats_for_favourite_genres()
-    # plot_favourite_genre_ratings_histogram(top_genres)
-
-    # ratings = analyser.get_ratings()
-    # plot_rating_difference_scatter(ratings)
-
-    # rating_differences = analyser.get_rating_differences()
-    # plot_rating_difference_distribution(rating_differences)
+    print(format_genre_combinations_output(movie_genre_combinations))
+    plot_movie_genre_combinations(movie_3genre_combinations[:10])
 
     del analyser

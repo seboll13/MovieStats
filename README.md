@@ -1,8 +1,11 @@
 # Movie and Show Statistics Analyser
 
 ## Overview
-The goal of this project is to provide a simple and easy-to-use tool to analyse personal ratings of movies and shows.
+The goal of this project is to provide a simple and easy-to-use tool to analyse personal ratings of movies and shows along with a simple recommending system.
 The script `ratings_analyser.py` initiates a connection to a local database to retrieve the provided ratings and then computes various statistics based on the data. The main program `main.py` intially creates and populates the database based on a provided csv file. When populating, the `imdb_fetcher.py` script is used to fetch cast and crew information from IMDb since it is not provided by default in the csv file. The `imdb_fetcher.py` script uses the IMDbPY library to fetch the required information. Finally, `db_functions.py` contains all functions necessary to interact with the database.
+
+## Recommendations
+The `recommendations.py` module is used to provide movie recommendations based on the analysed IMDb ratings data. The recommendations are tailored to the user's preferences, which are inferred from the provided csv file of ratings. The recommendation algorithm considers multiple parameters, which are currently being tested and optimised for the best performance.
 
 ## Features
 - Total watching time
