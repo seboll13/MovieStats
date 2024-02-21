@@ -47,6 +47,5 @@ def mysql_on_start():
 
 
 if __name__ == '__main__':
-    #mysql_on_start()
-    mysql_db = MySQLDatabaseHandler()
+    mysql_on_start()
     

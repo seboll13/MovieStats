@@ -1,4 +1,3 @@
-import os
 import pandas as pd
 from pathlib import Path
 from mysql.connector import connect, Error
@@ -130,43 +129,40 @@ class MySQLDatabaseHandler:
             print('Tables created successfully')
 
 
-    def add_cast_to_db(
-        self,
-        row: pd.Series,
-        fetcher: IMDbDataFetcher,
-        movie_id: int
-    ) -> None:
-        """Add actors to the titles database.
+    def db_adder_helper(self, movie_id: int, table_name: str, column_name: str, value: str) -> int:
+        """Helper function to add elements to the supplementary tables.
 
         Parameters
         ----------
-        row: The target row to fetch the cast from
-        fetcher: The IMDbDataFetcher object to use
-        movie_id: The id of the movie to link the actors to
+        movie_id: The id of the movie to link the element to
+        table_name: The name of the table to add the element to
+        column_name: The name of the column to add the element to
+        value: The value to add to the table
+
+        Returns
+        -------
+        int: The id of the added element
         """
-        actors = fetcher.get_full_cast(row['Const'])
-        for actor in actors:
-            self.cursor.execute(
-                '''INSERT INTO actors (name) VALUES (%s)
-                ON DUPLICATE KEY UPDATE name=name''', (actor.strip(),)
-            )
-            self.cursor.execute(
-                '''SELECT actor_id FROM actors WHERE name = %s''', (actor.strip(),)
-            )
-            actor_id = self.cursor.fetchone()[0]
-            self.cursor.execute(
-                '''INSERT INTO movie_actors (
-                    movie_id, actor_id
-                ) VALUES (%s,%s) 
-                ON DUPLICATE KEY UPDATE movie_id=movie_id''', (movie_id, actor_id)
-            )
+        self.cursor.execute(
+            f'''INSERT INTO {table_name} (name) 
+            SELECT * FROM (SELECT %s AS name) AS temp
+            WHERE NOT EXISTS (
+                SELECT name FROM {table_name} WHERE name = %s
+            ) LIMIT 1''', (value, value)
+        )
+        self.cursor.execute(
+            f'''SELECT {column_name} FROM {table_name} WHERE name = %s''', (value,)
+        )
+        entry_id = self.cursor.fetchone()[0]
+        self.cursor.execute(
+            f'''INSERT INTO movie_{table_name} (
+                movie_id, {column_name}
+            ) VALUES (%s,%s)
+            ON DUPLICATE KEY UPDATE movie_id=movie_id''', (movie_id, entry_id)
+        )
 
 
-    def add_genres_to_database(
-        self,
-        row: pd.Series,
-        movie_id: int
-    ) -> None:
+    def add_genres_to_database(self, row: pd.Series, movie_id: int) -> None:
         """Add genres to the local sqlite database.
 
         Parameters
@@ -174,128 +170,35 @@ class MySQLDatabaseHandler:
         row: The target row to fetch the genres from
         movie_id: The id of the movie to link the genres to
         """
-        genres = row['Genres'].strip().split(',') # strip() fixes whitespace issue
+        genres = row['Genres'].split(',')
         for genre in genres:
-            self.cursor.execute(
-                '''INSERT INTO genres (name) VALUES (%s)
-                ON DUPLICATE KEY UPDATE name=name''', (genre,)
-            )
-            self.cursor.execute(
-                '''SELECT genre_id FROM genres WHERE name = %s''', (genre,)
-            )
-            genre_id = self.cursor.fetchone()[0]
-            self.cursor.execute(
-                '''INSERT INTO movie_genres (
-                    movie_id, genre_id
-                ) VALUES (%s,%s)
-                ON DUPLICATE KEY UPDATE movie_id=movie_id''', (movie_id, genre_id)
-            )
+            self.db_adder_helper(movie_id, 'genres', 'genre_id', genre.strip())
 
 
-    def add_directors_to_database(
+    def add_cast_and_crew_to_database(
         self,
         row: pd.Series,
         fetcher: IMDbDataFetcher,
         movie_id: int
     ) -> None:
-        """Add directors to the titles database.
-
+        """Adds actors/directors/musicians to the titles database.
+        
         Parameters
         ----------
-        row: The target row to fetch the directors from
+        row: The target row to fetch the cast and crew from
         fetcher: The IMDbDataFetcher object to use
-        movie_id: The id of the movie to link the directors to
+        movie_id: The id of the movie to link the cast and crew to
         """
-        directors = fetcher.get_directors(row['Const'])
-        for director in directors:
-            self.cursor.execute(
-                '''INSERT INTO directors (name) VALUES (%s)
-                ON DUPLICATE KEY UPDATE name=name''', (director.strip(),)
-            )
-            self.cursor.execute(
-                '''SELECT director_id FROM directors WHERE name = %s''', (director.strip(),)
-            )
-            director_id = self.cursor.fetchone()[0]
-            self.cursor.execute(
-                '''INSERT INTO movie_directors (
-                    movie_id, director_id
-                ) VALUES (%s,%s)
-                ON DUPLICATE KEY UPDATE movie_id=movie_id''', (movie_id, director_id)
-            )
-
-
-    def add_musicians_to_database(
-        self,
-        row: pd.Series,
-        fetcher: IMDbDataFetcher,
-        movie_id: int
-    ) -> None:
-        """Add musicians to the titles database.
-
-        Parameters
-        ----------
-        row: The target row to fetch the musicians from
-        fetcher: The IMDbDataFetcher object to use
-        movie_id: The id of the movie to link the musicians to
-        """
-        musicians = fetcher.get_music_contributors(row['Const'])
-        for musician in musicians:
-            self.cursor.execute(
-                '''INSERT INTO musicians (name) VALUES (%s)
-                ON DUPLICATE KEY UPDATE name=name''', (musician.strip(),)
-            )
-            self.cursor.execute(
-                '''SELECT musician_id FROM musicians WHERE name = %s''', (musician.strip(),)
-            )
-            musician_id = self.cursor.fetchone()[0]
-            self.cursor.execute(
-                '''INSERT INTO movie_musicians (
-                    movie_id, musician_id
-                ) VALUES (%s,%s)
-                ON DUPLICATE KEY UPDATE movie_id=movie_id''', (movie_id, musician_id)
-            )
-
-
-    def populate_database(self) -> None:
-        """Populate the local sqlite database with IMDb ratings.
-            This function will search for ratings that are not already in the database and add them.
-        """
-        fetcher = IMDbDataFetcher()
-        ratings = pd.read_csv(RATINGS_FILE)
-
-        count_query = '''SELECT COUNT(*) FROM imdb_ratings'''
-        self.cursor.execute(count_query)
-        num_db_entries = self.cursor.fetchone()[0]
-
-        for _, row in ratings.iterrows():
-            self.cursor.execute(
-                '''SELECT const FROM imdb_ratings WHERE const = %s''', (row['Const'],)
-            )
-            if not self.cursor.fetchone():
-                values = (
-                    row['Const'], row['Your Rating'], row['Date Rated'], row['Title'], row['URL'],
-                    row['Title Type'], row['IMDb Rating'], row['Runtime (mins)'], row['Year'],
-                    row['Num Votes'], row['Release Date']
-                )
-                values = tuple(None if pd.isna(v) else v for v in values)
-                self.cursor.execute(
-                    '''INSERT INTO imdb_ratings (
-                        const, your_rating, date_rated, title, url, title_type,
-                        imdb_rating, runtime_mins, year, num_votes, release_date
-                    ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)''', (values)
-                )
-                movie_id = self.cursor.lastrowid
-                self.add_cast_to_db(row, fetcher, movie_id)
-                self.add_genres_to_database(row, movie_id)
-                self.add_directors_to_database(row, fetcher, movie_id)
-                self.add_musicians_to_database(row, fetcher, movie_id)
+        contributor_types = {
+            'actors': ('get_full_cast', 'actors', 'actor_id'),
+            'directors': ('get_directors', 'directors', 'director_id'),
+            'musicians': ('get_music_contributors', 'musicians', 'musician_id')
+        } # lists fetch_method, table_name and column_id for each contributor type
+        for fetch_method, table_name, column_id in contributor_types.values():
+            contributors = getattr(fetcher, fetch_method)(row['Const'])
+            for contributor in contributors:
+                self.db_adder_helper(movie_id, table_name, column_id, contributor.strip())
         self.connection.commit()
-
-        self.cursor.execute(count_query)
-        if self.cursor.fetchone()[0] > num_db_entries:
-            print('Database updated successfully')
-        else:
-            print('No new entries found')
 
 
     def update_cast_for_missing_movies(self):
@@ -339,3 +242,44 @@ class MySQLDatabaseHandler:
                         VALUES (%s, %s)''', (movie_id, contributor_id)
                     )
         self.connection.commit()
+
+
+    def populate_database(self) -> None:
+        """Populates the MySQL database with IMDb ratings.
+            
+            This function will search for ratings that are not already in the database and add them.
+        """
+        fetcher = IMDbDataFetcher()
+        ratings = pd.read_csv(RATINGS_FILE)
+
+        count_query = '''SELECT COUNT(*) FROM imdb_ratings'''
+        self.cursor.execute(count_query)
+        num_db_entries = self.cursor.fetchone()[0]
+
+        for _, row in ratings.iterrows():
+            self.cursor.execute(
+                '''SELECT const FROM imdb_ratings WHERE const = %s''', (row['Const'],)
+            )
+            if not self.cursor.fetchone():
+                values = (
+                    row['Const'], row['Your Rating'], row['Date Rated'], row['Title'], row['URL'],
+                    row['Title Type'], row['IMDb Rating'], row['Runtime (mins)'], row['Year'],
+                    row['Num Votes'], row['Release Date']
+                )
+                values = tuple(None if pd.isna(v) else v for v in values)
+                self.cursor.execute(
+                    '''INSERT INTO imdb_ratings (
+                        const, your_rating, date_rated, title, url, title_type,
+                        imdb_rating, runtime_mins, year, num_votes, release_date
+                    ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)''', (values)
+                )
+                movie_id = self.cursor.lastrowid
+                self.add_genres_to_database(row, movie_id)
+                self.add_cast_and_crew_to_database(row, fetcher, movie_id)
+        self.connection.commit()
+
+        self.cursor.execute(count_query)
+        if self.cursor.fetchone()[0] > num_db_entries:
+            print('Database updated successfully')
+        else:
+            print('No new entries found')
