@@ -9,7 +9,7 @@ from Code.moviestats.imdb_fetcher import IMDbDataFetcher
 
 
 DB_NAME = "imdb_ratings.db"
-RATINGS_FILE = Path(__file__).parent.resolve() / "../data/imdb_ratings.csv"
+RATINGS_FILE = Path(__file__).resolve().parent / "data/imdb_ratings.csv"
 
 
 def create_ratings_table(cursor: connect) -> None:
@@ -40,9 +40,12 @@ def create_supplementary_table(cursor: connect, table_name: str, columns: list) 
 
     Parameters
     ----------
-    cursor: The SQL cursor to use
-    table_name: The name of the table to create
-    columns: The columns to create in the table (must be of length 2)
+    cursor : connect
+        The SQL cursor to use
+    table_name : str
+        The name of the table to create
+    columns : list
+        The columns to create in the table (must be of length 2)
     """
     if len(columns) != 2:
         raise ValueError("columns must be of length 2")
@@ -61,9 +64,12 @@ def create_movie_relations_table(
 
     Parameters
     ----------
-    cursor: The SQL cursor to use
-    table_name: The name of the table to create
-    columns: The columns to create in the table (must be of length 2)
+    cursor : connect
+        The SQL cursor to use
+    table_name : str
+        The name of the table to create
+    columns : list
+        The columns to create in the table (must be of length 2)
     """
     if len(columns) != 2:
         raise ValueError("columns must be of length 2")
@@ -79,29 +85,34 @@ def create_movie_relations_table(
 
 
 def create_local_database(db_name: str = DB_NAME) -> None:
-    """Create a local sqlite database to store IMDb ratings."""
-    if not path.exists(db_name):
-        conn = connect(db_name)
-        cursor = conn.cursor()
+    """Create a local sqlite database to store IMDb ratings.
 
-        create_ratings_table(cursor)
-
-        create_supplementary_table(cursor, "actors", ["actor_id", "name"])
-        create_movie_relations_table(cursor, "movie_actors", ["actor_id", "actors"])
-
-        create_supplementary_table(cursor, "directors", ["director_id", "name"])
-        create_movie_relations_table(
-            cursor, "movie_directors", ["director_id", "directors"]
-        )
-
-        create_supplementary_table(cursor, "genres", ["genre_id", "name"])
-        create_movie_relations_table(cursor, "movie_genres", ["genre_id", "genres"])
-
-        conn.commit()
-        conn.close()
-        print("Database created successfully")
-    else:
+    Parameters
+    ----------
+    db_name : str
+        The name of the database to create
+    """
+    if path.exists(db_name):
         print("Database already exists")
+    conn = connect(db_name)
+    cursor = conn.cursor()
+
+    create_ratings_table(cursor)
+
+    create_supplementary_table(cursor, "actors", ["actor_id", "name"])
+    create_movie_relations_table(cursor, "movie_actors", ["actor_id", "actors"])
+
+    create_supplementary_table(cursor, "directors", ["director_id", "name"])
+    create_movie_relations_table(
+        cursor, "movie_directors", ["director_id", "directors"]
+    )
+
+    create_supplementary_table(cursor, "genres", ["genre_id", "name"])
+    create_movie_relations_table(cursor, "movie_genres", ["genre_id", "genres"])
+
+    conn.commit()
+    conn.close()
+    print("Database created successfully")
 
 
 def add_actors_to_database(
@@ -111,9 +122,12 @@ def add_actors_to_database(
 
     Parameters
     ----------
-    cursor: The SQL cursor to use
-    fetcher: The IMDbDataFetcher object to use
-    movie_id: The id of the movie to link the actors to
+    cursor : connect
+        The SQL cursor to use
+    fetcher : IMDbDataFetcher
+        The IMDbDataFetcher object to use
+    movie_id : int
+        The id of the movie to link the actors to
     """
     actors = fetcher.get_full_cast_and_crew(row["Const"])
     for actor in actors:
@@ -136,8 +150,10 @@ def add_genres_to_database(row: pd.Series, cursor: connect, movie_id: int) -> No
 
     Parameters
     ----------
-    cursor: The SQL cursor to use
-    movie_id: The id of the movie to link the genres to
+    cursor : connect
+        The SQL cursor to use
+    row : pd.Series
+        The row of the ratings dataframe to use
     """
     genres = row["Genres"].strip().split(",")  # strip() fixes whitespace issue
     for genre in genres:
@@ -160,9 +176,12 @@ def add_directors_to_database(row: pd.Series, cursor: connect, movie_id: int) ->
 
     Parameters
     ----------
-    cursor: The SQL cursor to use
-    fetcher: The IMDbDataFetcher object to use
-    movie_id: The id of the movie to link the directors to
+    row : pd.Series
+        The row containing movie information.
+    cursor : connect
+        The SQL cursor to use.
+    movie_id : int
+        The id of the movie to link the directors to.
     """
     if pd.isna(row["Directors"]):
         return
@@ -184,6 +203,18 @@ def add_directors_to_database(row: pd.Series, cursor: connect, movie_id: int) ->
 
 def populate_database(csv_ratings: str = RATINGS_FILE) -> None:
     """Populate the local sqlite database with IMDb ratings.
+
+    Parameters:
+    ----------
+    csv_ratings : str, optional
+        The filepath of the CSV file containing IMDb ratings. Default is RATINGS_FILE.
+
+    Returns:
+    -------
+    None
+
+    Notes:
+    ------
     This function will search for ratings that are not already in the database and add them.
     """
     conn = connect(DB_NAME)
@@ -238,10 +269,12 @@ def select(params: list[str], table: str = "imdb_ratings") -> str:
 
     Parameters
     ----------
-    params: the parameters to include in the query
+    params : list[str]
+        The parameters to select from the table
 
     Returns
     ----------
-    The formatted and ready to use SQL query
+    str
+        The SQL query string
     """
     return f"""SELECT {', '.join(p for p in params)} FROM {table}"""

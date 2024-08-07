@@ -27,29 +27,34 @@ def format_basic_output(data: list) -> str:
 
     Parameters
     ----------
-    data: The data to format
+    data : list
+        The data to format
 
     Returns
     ----------
-    The formatted data
+    str
+        The formatted output
     """
     return "\n".join(
         [f"{idx+1}: {movie_tuple}" for idx, movie_tuple in enumerate(data)]
     )
 
 
-def format_genre_combinations_output(data: list, top_n: int = 10):
+def format_genre_combinations_output(data: list, top_n: int = 10) -> str:
     """Formats the output of the get_movie_genre_combination_ratings function.
         This function prints the top_n most popular genre combinations for each combination size.
 
     Parameters
     ----------
-    data: The data to format
-    top_n: The number of entries to return
+    data : list
+        The data to format
+    top_n : int
+        The number of top entries to display for each combination
 
     Returns
     ----------
-    All formatted comparisons.
+    str
+        The formatted output
     """
     top_entries_by_length = {i: [] for i in range(1, MAX_GENRE_COMBINATIONS + 1)}
 
@@ -79,10 +84,15 @@ def compute_weighted_rating(v: int, R: float, C: float, m: int = 5) -> float:
 
     Parameters
     ----------
-    v: The number of ratings
-    R: The average rating
-    C: The mean rating across the dataset
-    m: The minimum number of ratings to consider, used to avoid outliers
+    v : int
+        The number of votes
+    R : float
+        The average rating
+    C : float
+        The mean rating across all movies
+    m : int
+        The minimum number of votes required to be considered.
+        5 is the default value
 
     Returns
     ----------

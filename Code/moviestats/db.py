@@ -1,5 +1,5 @@
-import pandas as pd
 from pathlib import Path
+import pandas as pd
 from mysql.connector import connect, Error
 from Code.moviestats.imdb_fetcher import IMDbDataFetcher
 
@@ -30,7 +30,8 @@ class MySQLDatabaseHandler:
 
         Returns
         -------
-        connection: The connection to the database
+        connection
+            The connection to the database
         """
         try:
             connection = connect(
@@ -46,12 +47,7 @@ class MySQLDatabaseHandler:
         return connection
 
     def create_ratings_table(self) -> None:
-        """Creates a table to store IMDb ratings.
-
-        Parameters
-        ----------
-        connection: The MySQL connector to use
-        """
+        """Creates a table to store IMDb ratings."""
         self.cursor.execute(
             """CREATE TABLE IF NOT EXISTS imdb_ratings(
                 id INTEGER PRIMARY KEY AUTO_INCREMENT,
@@ -74,9 +70,10 @@ class MySQLDatabaseHandler:
 
         Parameters
         ----------
-        connection: The MySQL connector to use
-        table_name: The name of the table to create
-        columns: The columns to create in the table (must be of length 2)
+        table_name : str
+            The name of the table to create
+        columns : list
+            The columns to create in the table (must be of length 2)
         """
         if len(columns) != 2:
             raise ValueError("columns must be of length 2")
@@ -92,9 +89,10 @@ class MySQLDatabaseHandler:
 
         Parameters
         ----------
-        connection: The MySQL connector to use
-        table_name: The name of the table to create
-        columns: The columns to create in the table (must be of length 2)
+        table_name : str
+            The name of the table to create
+        columns : list
+            The columns to create in the table (must be of length 2)
         """
         if len(columns) != 2:
             raise ValueError("columns must be of length 2")
@@ -129,19 +127,19 @@ class MySQLDatabaseHandler:
 
     def db_adder_helper(
         self, movie_id: int, table_name: str, column_name: str, value: str
-    ) -> int:
+    ) -> None:
         """Helper function to add elements to the supplementary tables.
 
         Parameters
         ----------
-        movie_id: The id of the movie to link the element to
-        table_name: The name of the table to add the element to
-        column_name: The name of the column to add the element to
-        value: The value to add to the table
-
-        Returns
-        -------
-        int: The id of the added element
+        movie_id : int
+            The id of the movie to link the element to
+        table_name : str
+            The name of the table to add the element to
+        column_name : str
+            The name of the column to add the element to
+        value : str
+            The value to add to the table
         """
         self.cursor.execute(
             f"""INSERT INTO {table_name} (name) 
@@ -168,8 +166,10 @@ class MySQLDatabaseHandler:
 
         Parameters
         ----------
-        row: The target row to fetch the genres from
-        movie_id: The id of the movie to link the genres to
+        row : pd.Series
+            The target row to fetch the genres from
+        movie_id : int
+            The id of the movie to link the genres to
         """
         genres = row["Genres"].split(",")
         for genre in genres:
@@ -182,9 +182,12 @@ class MySQLDatabaseHandler:
 
         Parameters
         ----------
-        row: The target row to fetch the cast and crew from
-        fetcher: The IMDbDataFetcher object to use
-        movie_id: The id of the movie to link the cast and crew to
+        row : pd.Series
+            The target row to fetch the cast and crew from
+        fetcher : IMDbDataFetcher
+            The IMDbDataFetcher object to use
+        movie_id : int
+            The id of the movie to link the cast and crew to
         """
         contributor_types = {
             "actors": ("get_full_cast", "actors", "actor_id"),

@@ -25,11 +25,13 @@ class RatingsAnalyser:
 
         Parameters
         ----------
-        top_n: the number of movies to return
+        top_n : int
+            the number of movies to return
 
         Returns
         ----------
-        The top n movies by personal rating
+        list
+            The top_n movies
         """
         if top_n < 1:
             raise ValueError(POSITIVE_INT_ERR_MESSAGE)
@@ -43,7 +45,8 @@ class RatingsAnalyser:
 
         Returns
         ----------
-        The list of movies and/or TV shows
+        list
+            The list of movies and/or TV shows for each rating
         """
         return self.cursor.execute(
             """SELECT title, your_rating FROM imdb_ratings 
@@ -55,27 +58,28 @@ class RatingsAnalyser:
 
         Parameters
         ----------
-        days: if True, return the total watching time in days
+        days : bool
+            if True, return the total watching time in days. Otherwise, return it in hours
 
         Returns
         ----------
-        The total watching time in hours/days
+        float
+            The total watching time
         """
         movies = self.cursor.execute(
             """SELECT runtime_mins FROM imdb_ratings 
             WHERE title_type = 'movie' """
         ).fetchall()
         total_time = sum(movie[0] for movie in movies)
-        if days:
-            return total_time / 60 / 24
-        return total_time / 60
+        return total_time / 60 / (24 if days else 1)
 
     def get_ratings(self) -> list:
         """Gets the list of IMDb and personal ratings.
 
         Returns
         ----------
-        The list of ratings
+        list
+            The list of ratings
         """
         return self.cursor.execute(
             """SELECT title, your_rating, imdb_rating FROM imdb_ratings"""
@@ -86,7 +90,8 @@ class RatingsAnalyser:
 
         Returns
         ----------
-        The list of differences
+        list
+            The list of rating differences
         """
         return self.cursor.execute(
             """SELECT title, your_rating - imdb_rating FROM imdb_ratings"""
@@ -97,7 +102,8 @@ class RatingsAnalyser:
 
         Returns
         ----------
-        The mean rating
+        float
+            The mean rating
         """
         return self.cursor.execute(
             """SELECT AVG(your_rating) FROM imdb_ratings"""
@@ -108,7 +114,8 @@ class RatingsAnalyser:
 
         Returns
         ----------
-        The average rating for each genre
+        list
+            The average rating for each genre
         """
         return self.cursor.execute(
             """SELECT TRIM(genres.name), AVG(ratings.your_rating) FROM imdb_ratings AS ratings
@@ -122,11 +129,13 @@ class RatingsAnalyser:
 
         Parameters
         ----------
-        is_movie: if True, filter only movies. Otherwise, filter only TV shows or mini-series
+        is_movie : bool
+            if True, return only movies. Otherwise, return only TV shows or mini-series
 
         Returns
         ----------
-        A list of tuples containing the movie, its associated genres and the personal rating
+        list
+            The mean rating and list of genres for each movie or TV show
         """
         type_filter = (
             "title_type='movie'"
@@ -140,16 +149,18 @@ class RatingsAnalyser:
             WHERE {type_filter} GROUP BY title ORDER BY title"""
         ).fetchall()
 
-    def get_mean_rating_for_highest_directors(self, top_n=10):
+    def get_mean_rating_for_highest_directors(self, top_n: int = 10):
         """Gets the mean personal rating for the top_n highest-rated directors
 
         Parameters
         ----------
-        top_n: the number of entries to return
+        top_n : int
+            the number of entries to return
 
         Returns
         ----------
-        The mean rating for each director
+        list
+            The mean rating for each director
         """
         if top_n < 1:
             raise ValueError(POSITIVE_INT_ERR_MESSAGE)
@@ -160,16 +171,18 @@ class RatingsAnalyser:
             GROUP BY directors.name ORDER BY AVG(your_rating) DESC LIMIT {top_n}"""
         ).fetchall()
 
-    def get_stats_for_most_frequent_directors(self, top_n=10):
+    def get_stats_for_most_frequent_directors(self, top_n: int = 10):
         """Gets the mean personal rating and count for the top_n directors with the most rated movies
 
         Parameters
         ----------
-        top_n: the number of entries to return
+        top_n : int
+            the number of entries to return
 
         Returns
         ----------
-        The mean rating and count for each director
+        list
+            The mean rating for each director
         """
         if top_n < 1:
             raise ValueError(POSITIVE_INT_ERR_MESSAGE)
@@ -186,11 +199,13 @@ class RatingsAnalyser:
 
         Parameters
         ----------
-        top_n: the number of entries to return
+        top_n : int
+            the number of entries to return
 
         Returns
         ----------
-        The mean rating for each actor
+        list
+            The mean rating for each actor
         """
         if top_n < 1:
             raise ValueError(POSITIVE_INT_ERR_MESSAGE)
@@ -206,11 +221,13 @@ class RatingsAnalyser:
 
         Parameters
         ----------
-        top_n: the number of entries to return
+        top_n : int
+            the number of entries to return
 
         Returns
         ----------
-        The mean rating and movie count for each actor
+        list
+            The mean rating and movie count for each actor
         """
         if top_n < 1:
             raise ValueError(POSITIVE_INT_ERR_MESSAGE)
@@ -227,11 +244,13 @@ class RatingsAnalyser:
 
         Parameters
         ----------
-        actor_name: the name of the actor
+        actor_name : str
+            The name of the actor
 
         Returns
         ----------
-        The list of movies and/or TV shows
+        list
+            The list of movies and/or TV shows for the actor
         """
         return self.cursor.execute(
             """SELECT title, your_rating FROM imdb_ratings

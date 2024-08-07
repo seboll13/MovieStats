@@ -1,5 +1,5 @@
 from imdb.imdb import IMDb
-from moviestats.helpers import timer
+from Code.moviestats.helpers import timer
 
 
 class IMDbDataFetcher:
@@ -14,11 +14,13 @@ class IMDbDataFetcher:
 
         Parameters
         ----------
-        movie_id: The IMDb ID of the movie or TV show
+        movie_id : str
+            The IMDb ID of the movie or TV show
 
         Returns
         ----------
-        The full cast of the title
+        list[str]
+            The full cast of the title
         """
         return self.ia.full_cast_and_crew(movie_id).cast_name
 
@@ -28,11 +30,13 @@ class IMDbDataFetcher:
 
         Parameters
         ----------
-        movie_id: The IMDb ID of the movie or TV show
+        movie_id : str
+            The IMDb ID of the movie or TV show
 
         Returns
         ----------
-        The list of directors of the title
+        list[str]
+            The list of directors of the title
         """
         return self.ia.full_cast_and_crew(movie_id).directors_name
 
@@ -42,10 +46,12 @@ class IMDbDataFetcher:
 
         Parameters
         ----------
-        movie_id: The IMDb ID of the movie or TV show
+        movie_id : str
+            The IMDb ID of the movie or TV show
 
         Returns
         ----------
-        The list of music contributors of the title
+        list[str]
+            The list of music contributors of the title
         """
         return self.ia.full_cast_and_crew(movie_id).music_name

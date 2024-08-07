@@ -11,7 +11,8 @@ def plot_favourite_genre_ratings_histogram(top_genres: list) -> None:
 
     Parameters
     ----------
-    top_genres: list of 3-tuples containing genre, title count and average rating
+    top_genres : list
+        list of 3-tuples containing genre, title count and average rating
     """
     plt.figure(figsize=(12, 8))
     genres, counts, ratings = zip(*top_genres)
@@ -35,7 +36,8 @@ def plot_movie_genre_combinations(genre_combinations_avg_ratings: list) -> None:
 
     Parameters
     ----------
-    genre_combinations_avg_ratings: list of 2-tuples containing genre combination and weighted average rating
+    genre_combinations_avg_ratings : list
+        list of 2-tuples containing genre combination and weighted average rating
     """
     plt.figure(figsize=(12, 8))
     combinations, weighted_average = zip(*genre_combinations_avg_ratings)
@@ -57,7 +59,8 @@ def plot_rating_difference_scatter(ratings: list) -> None:
 
     Parameters
     ----------
-    ratings: list of 3-tuples containing movie, IMDb rating and the personal rating
+    ratings : list
+        list of 3-tuples containing movie, IMDb rating and the personal rating
     """
     imdb_ratings = np.array([movie[1] for movie in ratings])
     personal_ratings = np.array([movie[2] for movie in ratings])
@@ -80,7 +83,8 @@ def plot_rating_difference_distribution(rating_differences: list) -> None:
 
     Parameters
     ----------
-    rating_differences: list of 2-tuples with movie and the rating difference
+    rating_differences : list
+        list of 2-tuples with movie and the rating difference
     """
     rating_differences = [diff for _, diff in rating_differences]
     plt.figure(figsize=(10, 6))

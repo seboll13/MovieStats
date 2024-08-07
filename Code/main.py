@@ -4,20 +4,15 @@ This file is used to run the program and display the results of the RatingsAnaly
 """
 
 from statistics import fmean
-from moviestats.db import MySQLDatabaseHandler
+from Code.moviestats.db import MySQLDatabaseHandler
 
-from moviestats.helpers import format_basic_output
-from moviestats.ratings_analyser import RatingsAnalyser
-from moviestats.db_functions import create_local_database, populate_database
+from Code.moviestats.helpers import format_basic_output
+from Code.moviestats.ratings_analyser import RatingsAnalyser
+from Code.moviestats.db_functions import create_local_database, populate_database
 
 
 def sqlite_on_start():
-    """The function to run when the program starts.
-
-    Parameters
-    ----------
-    analyser: The RatingsAnalyzer object to use
-    """
+    """The function to run when the program starts."""
     create_local_database()
     populate_database()
 
