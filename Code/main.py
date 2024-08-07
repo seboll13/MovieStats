@@ -47,5 +47,9 @@ def mysql_on_start():
 
 
 if __name__ == '__main__':
-    mysql_on_start()
+    #mysql_on_start()
+    #sqlite_on_start()
+
+    analyser = RatingsAnalyser('imdb_ratings.db')
+    print(format_basic_output(analyser.get_top_ratings(10)))
     
