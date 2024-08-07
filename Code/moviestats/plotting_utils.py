@@ -1,7 +1,6 @@
 """Utility functions for plotting data from the IMDb dataset.
 """
 
-
 from statistics import fmean
 import numpy as np
 import matplotlib.pyplot as plt
@@ -9,7 +8,7 @@ import matplotlib.pyplot as plt
 
 def plot_favourite_genre_ratings_histogram(top_genres: list) -> None:
     """Draw a bar plot of favourite genres with their associated title count and average rating.
-    
+
     Parameters
     ----------
     top_genres: list of 3-tuples containing genre, title count and average rating
@@ -18,22 +17,22 @@ def plot_favourite_genre_ratings_histogram(top_genres: list) -> None:
     genres, counts, ratings = zip(*top_genres)
     indices = range(len(genres))
 
-    plt.barh(indices, counts, color='skyblue', alpha=0.7, label='Movie Count')
+    plt.barh(indices, counts, color="skyblue", alpha=0.7, label="Movie Count")
 
     # Add average ratings as text next to the bars
     for i, (count, rating) in enumerate(zip(counts, ratings)):
-        plt.text(count, i, f' {rating:.2f}', va='center', ha='left', color='black')
+        plt.text(count, i, f" {rating:.2f}", va="center", ha="left", color="black")
 
     plt.yticks(indices, genres)
-    plt.xlabel('Movie Count')
-    plt.title('Top-Rated Genres with Average Ratings')
+    plt.xlabel("Movie Count")
+    plt.title("Top-Rated Genres with Average Ratings")
 
     plt.show()
 
 
 def plot_movie_genre_combinations(genre_combinations_avg_ratings: list) -> None:
     """Draw a bar plot of movie genre combinations with their associated weighted average value.
-    
+
     Parameters
     ----------
     genre_combinations_avg_ratings: list of 2-tuples containing genre combination and weighted average rating
@@ -42,11 +41,13 @@ def plot_movie_genre_combinations(genre_combinations_avg_ratings: list) -> None:
     combinations, weighted_average = zip(*genre_combinations_avg_ratings)
     indices = range(len(combinations))
 
-    plt.barh(indices, weighted_average, color='skyblue', alpha=0.7, label='Weighted Average')
+    plt.barh(
+        indices, weighted_average, color="skyblue", alpha=0.7, label="Weighted Average"
+    )
 
-    plt.yticks(indices, (', '.join(comb) for comb in combinations))
-    plt.xlabel('Weighted Average Value')
-    plt.title('Top-Rated Movie Genre Combinations')
+    plt.yticks(indices, (", ".join(comb) for comb in combinations))
+    plt.xlabel("Weighted Average Value")
+    plt.title("Top-Rated Movie Genre Combinations")
 
     plt.show()
 
@@ -66,10 +67,10 @@ def plot_rating_difference_scatter(ratings: list) -> None:
 
     # Add regression line to scatter plot
     plt.scatter(imdb_ratings, personal_ratings)
-    plt.plot(imdb_ratings, reg_line, color='red')  # regression line
-    plt.xlabel('IMDb Rating')
-    plt.ylabel('Personal Rating')
-    plt.title('IMDb vs Personal Rating Differences incl. Regression Line')
+    plt.plot(imdb_ratings, reg_line, color="red")  # regression line
+    plt.xlabel("IMDb Rating")
+    plt.ylabel("Personal Rating")
+    plt.title("IMDb vs Personal Rating Differences incl. Regression Line")
 
     plt.show()
 
@@ -81,20 +82,15 @@ def plot_rating_difference_distribution(rating_differences: list) -> None:
     ----------
     rating_differences: list of 2-tuples with movie and the rating difference
     """
-    rating_differences = [diff for _,diff in rating_differences]
+    rating_differences = [diff for _, diff in rating_differences]
     plt.figure(figsize=(10, 6))
-    plt.hist(rating_differences, bins=30, color='skyblue', edgecolor='black')
-    plt.title('Distribution of Rating Differences (Your Rating - IMDb Rating)')
-    plt.xlabel('Rating Difference')
-    plt.ylabel('Frequency')
+    plt.hist(rating_differences, bins=30, color="skyblue", edgecolor="black")
+    plt.title("Distribution of Rating Differences (Your Rating - IMDb Rating)")
+    plt.xlabel("Rating Difference")
+    plt.ylabel("Frequency")
 
     rmean = fmean(rating_differences)
-    plt.axvline(rmean, color='red', linestyle='dashed', linewidth=1)
-    plt.text(
-        rmean,
-        plt.ylim()[1]*0.9,
-        f'Mean: {rmean:.2f}',
-        color = 'red'
-    )
+    plt.axvline(rmean, color="red", linestyle="dashed", linewidth=1)
+    plt.text(rmean, plt.ylim()[1] * 0.9, f"Mean: {rmean:.2f}", color="red")
     plt.grid(True)
     plt.show()

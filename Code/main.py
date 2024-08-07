@@ -23,21 +23,19 @@ def sqlite_on_start():
 
 
 def sqlite_main():
-    """Main function to run when using sqlite3 as the database.
-    """
+    """Main function to run when using sqlite3 as the database."""
     sqlite_on_start()
-    analyser = RatingsAnalyser('imdb_ratings.db')
+    analyser = RatingsAnalyser("imdb_ratings.db")
 
-    movie_list = analyser.get_movie_list_for('Morgan Freeman')
+    movie_list = analyser.get_movie_list_for("Morgan Freeman")
     print(format_basic_output(movie_list))
-    print(f'Average rating : {fmean((m[1] for m in movie_list))}')
+    print(f"Average rating : {fmean((m[1] for m in movie_list))}")
 
     del analyser
 
 
 def mysql_on_start():
-    """The function to run for MySQL database population when the program starts.
-    """
+    """The function to run for MySQL database population when the program starts."""
     mysql_db = MySQLDatabaseHandler()
 
     mysql_db.create_db_tables()
@@ -46,10 +44,9 @@ def mysql_on_start():
     del mysql_db
 
 
-if __name__ == '__main__':
-    #mysql_on_start()
-    #sqlite_on_start()
+if __name__ == "__main__":
+    # mysql_on_start()
+    # sqlite_on_start()
 
-    analyser = RatingsAnalyser('imdb_ratings.db')
+    analyser = RatingsAnalyser("imdb_ratings.db")
     print(format_basic_output(analyser.get_top_ratings(10)))
-    

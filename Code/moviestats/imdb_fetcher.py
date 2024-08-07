@@ -3,11 +3,10 @@ from moviestats.helpers import timer
 
 
 class IMDbDataFetcher:
-    """A class to fetch data from the IMDb database.
-    """
+    """A class to fetch data from the IMDb database."""
+
     def __init__(self):
         self.ia = IMDb()
-
 
     @timer
     def get_full_cast_and_crew(self, movie_id: str) -> list[str]:
@@ -23,7 +22,6 @@ class IMDbDataFetcher:
         """
         return self.ia.full_cast_and_crew(movie_id).cast_name
 
-
     @timer
     def get_directors(self, movie_id: str) -> list[str]:
         """Get the list of directors of a movie or TV show by its IMDb ID.
@@ -37,7 +35,6 @@ class IMDbDataFetcher:
         The list of directors of the title
         """
         return self.ia.full_cast_and_crew(movie_id).directors_name
-
 
     @timer
     def get_music_contributors(self, movie_id: str) -> list[str]:
